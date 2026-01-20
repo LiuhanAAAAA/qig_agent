@@ -1,0 +1,80 @@
+task_name: miaotu_avatar
+
+business_goal: >
+  Generate a batch of usable avatar images for an account theme.
+  Output should be safe, centered, clear, and visually pleasing.
+
+generation:
+  prompt_candidates_k: 6            # 每轮生成多少个 prompt 候选
+  images_per_prompt: 2            # 每个 prompt 生几张图（best-of-n）
+  max_iters: 2                      # 最多循环几轮（失败就修复再试）
+  final_topk: 8                     # 最后导出 topK 图片
+  steps: 20
+  enable_cpu_offload: true
+  decode_device: auto   # auto / cpu / cuda
+
+
+
+thresholds:
+  prompt_min_score: 0.60
+  image_min_score: 0.68
+
+hard_constraints:
+  enforce:
+    image_size: [768, 768]
+    image_format: "png"
+  detect:
+    forbid_realistic_face: true
+    forbid_text_overlay: true
+    forbid_logo_watermark: true
+    forbid_qrcode: true
+    forbid_political_nsfw_violence: true
+
+soft_dimensions:
+  - composition
+  - clarity
+  - style_match
+  - aesthetic
+  - thumbnail_legibility
+
+weights:
+  clip_alignment: 0.55
+  sharpness: 0.20
+  aesthetic: 0.25
+
+prompt_policy:
+  base_style: >
+    anime illustration, clean background, centered subject, high quality,
+    soft lighting, minimal clutter, sharp focus
+  negative_prompt: >
+    realistic photo, watermark, logo, text, QR code, blurry, low quality,
+    deformed, extra limbs, bad anatomy, nsfw, violence, political symbols
+
+taxonomy_autofix:
+  blurry:
+    add_positive: "sharp focus, high detail, crisp edges"
+    add_negative: "motion blur, out of focus"
+  low_clip:
+    add_positive: "clear subject, close-up portrait, head-and-shoulders"
+    add_negative: ""
+  has_text:
+    add_positive: "no text"
+    add_negative: "text, caption, watermark"
+  has_face:
+    add_positive: "cartoon style, illustration face"
+    add_negative: "realistic face, photo portrait"
+
+memory:
+  enabled: true
+  top_k_retrieve: 3
+  min_score_to_store: 0.70
+
+prompt_mutation:
+  enabled: true
+  mutations_per_prompt: 2
+
+reward_calibration:
+  enabled: true
+  method: "lr"                 # or "xgb"
+  model_path: "configs/reward_calibrator.joblib"
+  alpha: 0.45                  # final = (1-alpha)*base + alpha*calib
