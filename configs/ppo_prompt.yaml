@@ -1,0 +1,61 @@
+# configs/ppo_prompt.yaml
+run:
+  out_root: runs_ppo
+  seed: 42
+
+task:
+  task_spec_path: configs/miaotu_avatar.yaml
+  # 训练时用的 query 列表（先给你默认 1 条，后面你可以扩展成文件/数据集）
+  user_queries:
+    - "healing cute avatar for a pet-themed account"
+
+policy_model:
+  # 4070 8G 可跑（4bit+LoRA）
+  model_id: Qwen/Qwen2.5-1.5B-Instruct
+  use_4bit: true
+  lora_r: 16
+  lora_alpha: 32
+  lora_dropout: 0.05
+  max_new_tokens: 160
+  temperature: 0.9
+  top_p: 0.92
+
+ppo:
+  learning_rate: 1.0e-5
+  batch_size: 4
+  mini_batch_size: 2
+  ppo_epochs: 2
+  clip_range: 0.2
+  kl_coef: 0.05
+  total_updates: 50
+
+multi_fidelity:
+  # 每个 query 先生成多少 prompt 候选
+  num_prompt_candidates: 6
+  # 其中多少个进入生图（越小越省钱）
+  topk_to_generate_images: 2
+  # 每个 prompt 生成几张图
+  images_per_prompt: 2
+
+reward:
+  w_prompt: 0.35
+  w_image: 0.65
+  hard_fail_penalty: 1.5
+  len_target: 80
+  len_penalty: 0.02
+  rep_penalty: 0.10
+
+logging:
+  save_every: 10
+
+agent_loop:
+  enabled: true
+  max_steps: 4
+  max_images: 4
+  images_per_step: 1
+  stop_score: 0.82
+  stop_if_no_hard_fail: true
+  ucb_c: 1.0
+  mutate_on_failure: true
+  mutate_min_trials: 6
+  mutate_max_success_rate: 0.20

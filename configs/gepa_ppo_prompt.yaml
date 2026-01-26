@@ -1,0 +1,75 @@
+run:
+  out_root: runs/gepa_ppo
+
+task:
+  task_spec_path: configs/task_specs/baike_person.yaml
+  user_queries:
+    - "生成一张中国古代历史人物画像：汉朝将军，威严但不夸张，写实插画风格"
+    - "生成一张唐朝诗人的人物插画，背景为长安街景，古风电影感"
+
+# ✅新增：图片规格（不写就走默认 1024x1024/25steps，会很慢）
+image:
+  model_id: stabilityai/stable-diffusion-xl-base-1.0
+  width: 512
+  height: 512
+  num_inference_steps: 10
+  guidance_scale: 6.0
+  enable_model_cpu_offload: true
+  vae_fp32: true
+
+policy_model:
+  model_name_or_path: Qwen/Qwen2.5-1.5B-Instruct
+  max_new_tokens: 128
+  temperature: 0.9
+  top_p: 0.95
+
+reward:
+  w_prompt: 0.55
+  w_image: 0.45
+  token_len_penalty: 0.0008
+  rep_sim_penalty: 0.25
+  hard_fail_penalty: 0.6
+
+# ✅减少 expensive 图像评估次数（不然 SDXL 慢到像卡死）
+multi_fidelity:
+  num_prompt_candidates: 10
+  topk_to_generate_images: 1
+  images_per_prompt: 1
+
+gepa:
+  population_size: 8
+  generations: 4
+  elite_frac: 0.35
+  mutation_prob: 0.70
+  crossover_prob: 0.20
+  topk_to_generate_images: 1
+  images_per_prompt: 1
+  target_reward: 0.86
+  max_steps_per_episode: 6
+  max_words: 180
+
+skills:
+  ucb_c: 1.4
+
+ppo:
+  learning_rate: 0.00005
+  num_ppo_epochs: 2
+  mini_batch_size: 4
+  clip_range: 0.2
+  vf_coef: 0.5
+  kl_coef: 0.01
+  max_grad_norm: 1.0
+  total_updates: 50
+
+logging:
+  save_every: 10
+
+llm:
+  backend: ollama
+  base_url: http://localhost:11434
+  model: qwen3:4b
+  think: false
+  timeout: 600
+  connect_timeout: 5
+  retries: 2
+  retry_backoff: 2.0
