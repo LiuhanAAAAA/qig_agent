@@ -7,7 +7,7 @@ task:
     - "生成一张中国古代历史人物画像：汉朝将军，威严但不夸张，写实插画风格"
     - "生成一张唐朝诗人的人物插画，背景为长安街景，古风电影感"
 
-# ✅新增：图片规格（不写就走默认 1024x1024/25steps，会很慢）
+#图片规格（不写就走默认 1024x1024/25steps）
 image:
   model_id: stabilityai/stable-diffusion-xl-base-1.0
   width: 512
@@ -30,7 +30,7 @@ reward:
   rep_sim_penalty: 0.25
   hard_fail_penalty: 0.6
 
-# ✅减少 expensive 图像评估次数（不然 SDXL 慢到像卡死）
+# expensive 图像评估次数
 multi_fidelity:
   num_prompt_candidates: 10
   topk_to_generate_images: 1
