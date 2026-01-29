@@ -12,16 +12,7 @@ from src.utils.logger import log_info
 
 
 class ImageGenerator:
-    """
-    ✅ 修复目标：
-    1) enable_model_cpu_offload=True 时，diffusers/accelerate 会动态搬运模块，
-       `next(vae.parameters()).device` 不可靠，forward 可能在 CUDA 执行。
-       所以 decode 时 latents 必须跟随 pipe._execution_device（真实执行设备）。
-    2) 支持 decode_device:
-       - "auto"：默认，latents 跟随 _execution_device（推荐）
-       - "cpu" ：强制 VAE+latents 在 CPU 解码（最省显存，最稳，但慢）
-       - "cuda": 强制 VAE+latents 在 CUDA 解码（最快，但可能 OOM）
-    """
+
 
     def __init__(self, task_spec: Dict[str, Any]):
         self.spec = task_spec
@@ -72,7 +63,7 @@ class ImageGenerator:
             pass
 
         if self.enable_cpu_offload and self.device == "cuda":
-            # ✅ offload 开启后不要再 pipe.to("cuda")，否则容易出现设备乱跳
+           
             self.pipe.enable_model_cpu_offload()
             log_info("[INFO] enable_model_cpu_offload ON")
         else:
@@ -86,9 +77,7 @@ class ImageGenerator:
             pass
 
     def _get_execution_device(self) -> torch.device:
-        """
-        ✅ diffusers 在 offload 模式下真正执行的设备，应该用 pipe._execution_device
-        """
+       
         exec_dev = getattr(self.pipe, "_execution_device", None)
         if exec_dev is None:
             exec_dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -102,21 +91,17 @@ class ImageGenerator:
 
         # SDXL scaling
         scaling = getattr(self.pipe.vae.config, "scaling_factor", 0.13025)
-
-        # offload 模式下：真实执行设备必须跟随 _execution_device
         exec_dev = self._get_execution_device()
 
         # ---- 决定 decode_device ----
         mode = self.decode_device
 
         if mode == "cpu":
-            # ✅ 强制 CPU 解码（最稳，最省显存）
             vae.to("cpu", dtype=torch.float32)
             target_device = torch.device("cpu")
             target_dtype = torch.float32
 
         elif mode == "cuda":
-            # ✅ 强制 CUDA 解码（最快，但可能 OOM）
             if torch.cuda.is_available():
                 vae.to("cuda")
                 target_device = torch.device("cuda")
@@ -127,8 +112,6 @@ class ImageGenerator:
                 target_dtype = torch.float32
 
         else:
-            # ✅ auto：关键修复点 —— latents 跟随执行设备
-            # 注意：在 offload 模式下，vae.parameters() 的 device 可能不可信
             target_device = exec_dev
             # dtype 用 VAE 当前 dtype（一般 fp32）
             try:
@@ -136,7 +119,6 @@ class ImageGenerator:
             except Exception:
                 target_dtype = torch.float32
 
-        # ✅ 关键：latents 必须放到 target_device，否则必炸 device mismatch
         latents = (latents / scaling).to(device=target_device, dtype=target_dtype)
 
         decoded = vae.decode(latents, return_dict=False)[0]
@@ -147,7 +129,6 @@ class ImageGenerator:
         out_path = Path(out_dir)
         out_path.mkdir(parents=True, exist_ok=True)
 
-        # ✅ 生成 n 张 latent（别忘了这个参数）
         result = self.pipe(
             prompt=prompt,
             num_inference_steps=self.steps,
