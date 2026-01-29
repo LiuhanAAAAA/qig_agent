@@ -73,8 +73,7 @@ def build_training_data_from_runs(runs_dir: str) -> Tuple[np.ndarray, np.ndarray
 
     X, y = [], []
     for fp in files:
-        # ✅ 每个 run 目录里一般都有 configs/miaotu_avatar.yaml 的 spec，
-        # 但为了简单，我们先用默认阈值 0.68，如果 jsonl 里包含它则用它。
+        # 直接用spec
         default_min_score = 0.68
 
         with open(fp, "r", encoding="utf-8") as f:
@@ -88,7 +87,7 @@ def build_training_data_from_runs(runs_dir: str) -> Tuple[np.ndarray, np.ndarray
                 if not metrics:
                     continue
 
-                # -------- label 逻辑（关键修复点）--------
+                # label 逻辑
                 if "accepted" in row:
                     label = 1 if bool(row["accepted"]) else 0
                 else:
