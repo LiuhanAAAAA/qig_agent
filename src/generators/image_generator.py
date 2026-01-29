@@ -26,11 +26,11 @@ class ImageGenerator:
         self.steps = int(gen_cfg.get("steps", 25))
         self.guidance_scale = float(gen_cfg.get("guidance_scale", 7.0))
 
-        # 设备与 offload
+      
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.enable_cpu_offload = bool(gen_cfg.get("enable_cpu_offload", True))
 
-        # 解码策略：auto/cpu/cuda
+
         self.decode_device = str(gen_cfg.get("decode_device", "auto")).lower()
 
         model_id = gen_cfg.get("model_id", "stabilityai/stable-diffusion-xl-base-1.0")
@@ -48,7 +48,6 @@ class ImageGenerator:
             variant="fp16" if torch_dtype == torch.float16 else None,
         )
 
-        # 省显存技巧：有就开
         try:
             self.pipe.enable_attention_slicing()
         except Exception:
@@ -105,7 +104,7 @@ class ImageGenerator:
             if torch.cuda.is_available():
                 vae.to("cuda")
                 target_device = torch.device("cuda")
-                # VAE dtype：你前面已 upcast fp32 也没问题，这里就直接用当前 dtype
+                # VAE dtype：
                 target_dtype = next(vae.parameters()).dtype
             else:
                 target_device = torch.device("cpu")
