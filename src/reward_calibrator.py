@@ -46,7 +46,7 @@ def build_feature_dict(
 ) -> Dict[str, float]:
     """
     把 (prompt, metrics, penalties) 变成可训练/可推理的特征字典。
-    ✅ 这个函数是 Reward Calibration 的“协议”，训练和推理必须一致。
+    这个函数是 Reward Calibration 的“协议”，训练和推理必须一致
     """
     prompt = prompt or ""
     base_style = task_spec.get("prompt_policy", {}).get("base_style", "") or ""
@@ -79,7 +79,7 @@ def build_feature_dict(
         "neg_len": neg_len,
     }
 
-    # 可以扩展一些上下文特征（不影响兼容）
+    # 可以扩展一些上下文特征
     feat["base_style_len"] = float(len(base_style))
     return feat
 
