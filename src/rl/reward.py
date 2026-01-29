@@ -39,7 +39,7 @@ def combine_reward(
       - 未生图 image_score=None -> 只用 prompt_score
       - 生图 image_score!=None -> prompt+image
 
-    最终 reward 越大越好（PPO 最大化它）。
+    最终 reward 越大越好，PPO 最大化
     """
     r = 0.0
 
@@ -49,13 +49,13 @@ def combine_reward(
     else:
         r += cfg.w_prompt * float(prompt_score) + cfg.w_image * float(image_score)
 
-    # 长度正则（轻罚）
+    # 长度正则（轻）
     r -= length_penalty(token_len, cfg.len_target, cfg.len_penalty)
 
-    # 防雷同（工业很重要）
+    # 防雷同
     r -= cfg.rep_penalty * float(rep_sim)
 
-    # hard fail 重罚
+    # hard fail 重
     if hard_fail:
         r -= cfg.hard_fail_penalty
 
