@@ -24,10 +24,10 @@ class PromptBank:
         self.conn = sqlite3.connect(self.db_path)
         self._init_db()
 
-        # embedding 模型（第一次会下载）
+        # embedding 模型
         self.embedder = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
-        # faiss index（同目录）
+        # faiss index
         self.index_path = self.db_path + ".faiss"
         self.dim = 384
         self.index = FaissIndex(self.dim, self.index_path)
