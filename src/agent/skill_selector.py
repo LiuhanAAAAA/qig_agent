@@ -15,7 +15,7 @@ class SkillStats:
 @dataclass
 class SkillSelector:
     """
-    ✅ UCB1 selector：让 Agent “越用越聪明”
+    UCB1 selector，让 Agent 在技能上自我进化
     """
     c: float = 1.4
     stats: Dict[str, SkillStats] = field(default_factory=dict)
@@ -32,7 +32,7 @@ class SkillSelector:
         if len(skill_names) == 0:
             return None
 
-        # cold-start：先都试一遍
+        # cold-start：冷启动，防止局部最优，先都试一遍
         for s in skill_names:
             if self.stats.get(s, SkillStats()).n == 0:
                 return s
