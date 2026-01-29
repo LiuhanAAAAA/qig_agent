@@ -31,7 +31,7 @@ from src.utils.logger import log_info
 def node_retrieve_memory(state: dict) -> dict:
     spec = state["task_spec"]
 
-    # ✅ PromptBank 需要 sqlite 文件路径，不是目录
+    # 需要 sqlite 文件路径
     db_path = str(Path(state["run_dir"]) / "prompt_bank.sqlite")
     bank = PromptBank(db_path)
 
@@ -94,7 +94,7 @@ def node_select_prompts(state: Dict[str, Any]) -> Dict[str, Any]:
     good = [x for x in state["prompt_eval"] if x["score"] >= th]
     good = sorted(good, key=lambda x: x["score"], reverse=True)
 
-    # ✅注意：选的是 rewrite（因为 evaluator 可能自动补齐 negative prompt）
+
     selected = [x.get("rewrite", x["prompt"]) for x in good[: int(spec["generation"]["prompt_candidates_k"])]]
 
     if not selected:
@@ -202,7 +202,7 @@ def node_accept_and_store(state: Dict[str, Any]) -> Dict[str, Any]:
     img_th = float(spec.get("thresholds", {}).get("image_min_score", 0.68))
 
     for i, r in enumerate(topk):
-        # ✅ accepted label：用于 reward calibrator 训练
+        # accepted label：用于 reward calibrator 训练
         accepted = (not r["hard_fail"]) and (r["score"] >= img_th)
 
         append_jsonl(results_path, {
@@ -232,7 +232,7 @@ def node_accept_and_store(state: Dict[str, Any]) -> Dict[str, Any]:
                     score=float(r["score"]),
                     failure_tags=r["tags"],
                     gen_params={"model": "sdxl", "n": spec.get("generation", {}).get("images_per_prompt_n", 1)},
-                    fixed_prompt="",  # 这里留空，你后面可以存 Policy Agent 的修复版本
+                    fixed_prompt="", 
                 )
 
     log_info(f"Accepted topK: {len(topk)}")
