@@ -19,7 +19,7 @@ def _build_base_prompt(spec: Dict[str, Any], user_query: str) -> str:
 
 def _expand_agent_generate_variants(spec: Dict[str, Any], user_query: str, k: int) -> List[str]:
     """
-    Expand Agent：扩写出不同角度 prompt（不依赖 LLM，稳定可控）
+    Expand Agent：扩写出不同角度 prompt,用policy llm
     """
     seeds = [
         "a chibi character smiling, energetic and bright",
@@ -89,20 +89,20 @@ def generate_prompt_candidates(
     run_dir: str = ".",
 ) -> List[str]:
     """
-    ✅ 主入口：graph.py 调用它
+    主入口：graph.py 
     """
     retrieved = retrieved or []
 
     # 1) Expand：先生成候选
     prompts = _expand_agent_generate_variants(spec, user_query, k=k)
 
-    # 2) 结合 retrieved memory few-shot（如果你想用：把历史高分 prompt prepend）
+    # 2) 结合 retrieved memory few-shot（把历史高分 prompt prepend）
     if retrieved:
         # retrieved 是 PromptBank.retrieve_similar 的输出 dict 列表
         top = [r["prompt"] for r in retrieved if "prompt" in r][:2]
         prompts = top + prompts
 
-    # 3) Policy：先验规避（首次生成就避坑）
+    # 3) Policy：先验规避
     prompts = _policy_agent_apply_prior_avoidance(spec, run_dir, prompts)
 
     return prompts[:k]
