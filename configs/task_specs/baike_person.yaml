@@ -1,7 +1,7 @@
 hard_constraints:
   detect:
     forbid_text_overlay: true
-    forbid_realistic_face: true   # ✅ 只禁真人脸（卡通/二次元 ok）
+    forbid_realistic_face: true  
 
 soft_preferences:
   style:
