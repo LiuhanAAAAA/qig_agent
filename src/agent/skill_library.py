@@ -65,7 +65,7 @@ def _shorten_prompt(prompt: str, max_words: int = 110) -> str:
 
 def _expand_prompt(prompt: str) -> str:
     """
-    prompt 太短时给一个稳的扩展（规则 patch）
+    prompt 太短时给一个稳的扩展.规则 patch
     """
     pos, neg = _split_pos_neg(prompt)
     if len(pos.split()) >= 12:
@@ -78,7 +78,7 @@ def _expand_prompt(prompt: str) -> str:
 class SkillLibrary:
     """
     ✅ Level B：tag -> skill（规则技能）
-    你后面可以接入：检索技能 / 小模型技能
+
     """
     def __init__(self):
         self.skills: Dict[str, Skill] = {}
@@ -100,7 +100,7 @@ class SkillLibrary:
             )
         ))
 
-        # 2) ✅ 只禁真人脸
+        # 2)  禁真人脸
         self._register(Skill(
             name="add_neg_realistic_face",
             description="Add negative tokens to suppress photorealistic human faces only",
