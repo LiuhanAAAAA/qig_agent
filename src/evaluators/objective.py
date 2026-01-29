@@ -26,7 +26,6 @@ def _load_calibrator(model_path: str):
         _CALIBRATOR_CACHE[p] = None
         return None
 
-    # ✅ 新格式：dict payload
     if isinstance(obj, dict) and "model" in obj:
         _CALIBRATOR_CACHE[p] = obj
         return obj
@@ -44,8 +43,8 @@ def objective_score(
     penalties: Dict[str, float],
     tags: Optional[List[str]] = None,
     metrics: Optional[Dict[str, Any]] = None,
-    prompt: Optional[str] = None,   # ✅ 关键修复：允许传 prompt，但这里不强依赖
-    **kwargs,                       # ✅ 兼容未来扩展参数
+    prompt: Optional[str] = None,   
+    **kwargs,                      
 ) -> Tuple[float, List[str]]:
     """
     返回：
