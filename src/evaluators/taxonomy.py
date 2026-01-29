@@ -4,14 +4,7 @@ from typing import Dict, Any, List, Optional
 
 
 def taxonomy_from_metrics(task_spec_or_metrics: Dict[str, Any], metrics: Optional[Dict[str, Any]] = None) -> List[str]:
-    """
-    ✅ 兼容两种调用方式：
-    - taxonomy_from_metrics(metrics)
-    - taxonomy_from_metrics(task_spec, metrics)
-
-    你现在报错就是因为你项目里函数签名变成了第二种，但调用还是第一种。
-    我这里直接做成“自动兼容”，以后不再因为签名不一致炸。
-    """
+   
     if metrics is None:
         metrics = task_spec_or_metrics
 
@@ -71,7 +64,6 @@ def build_prior_avoidance_negative(
     top_k_tags: int = 3
 ) -> str:
     """
-    ✅ 兼容多种调用形式：
     - build_prior_avoidance_negative(spec, ["blurry","has_text"], top_k_tags=3)
     - build_prior_avoidance_negative(spec, {"blurry": 12, "has_text": 3}, top_k_tags=3)
 
