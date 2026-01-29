@@ -29,7 +29,7 @@ def main():
     }
 
     final = graph.invoke(init_state)
-    log_info("✅ Finished. Check outputs in runs/ folder.")
+    log_info("############### Finished. Check outputs in runs/ folder.")
     log_info(f"TopK = {len(final.get('accepted_topk', []))}")
 
 if __name__ == "__main__":
