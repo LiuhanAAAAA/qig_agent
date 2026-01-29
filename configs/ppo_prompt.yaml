@@ -5,7 +5,7 @@ run:
 
 task:
   task_spec_path: configs/miaotu_avatar.yaml
-  # 训练时用的 query 列表（先给你默认 1 条，后面你可以扩展成文件/数据集）
+  # 训练时用的 query 列表
   user_queries:
     - "healing cute avatar for a pet-themed account"
 
@@ -32,7 +32,7 @@ ppo:
 multi_fidelity:
   # 每个 query 先生成多少 prompt 候选
   num_prompt_candidates: 6
-  # 其中多少个进入生图（越小越省钱）
+  # 其中多少个进入生图
   topk_to_generate_images: 2
   # 每个 prompt 生成几张图
   images_per_prompt: 2
