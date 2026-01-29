@@ -29,7 +29,7 @@ class OllamaConfig:
     connect_timeout: int = 5
     retries: int = 2
     retry_backoff: float = 2.0
-    think: bool = False   # ✅ 关键：关闭 thinking，保证 content 不为空
+    think: bool = False   # 关 thinking，保证 content 不为空
 
 
 class OllamaClient:
@@ -52,7 +52,7 @@ class OllamaClient:
             "model": self.cfg.model,
             "messages": messages,
             "stream": False,
-            "think": bool(self.cfg.think),  # ✅ 关键
+            "think": bool(self.cfg.think), 
             "options": {
                 "temperature": float(temperature),
                 "num_predict": int(max_tokens),
@@ -73,13 +73,11 @@ class OllamaClient:
                 msg = (data or {}).get("message", {}) or {}
                 content = (msg.get("content") or "").strip()
 
-                # ✅ 如果你不小心开了 think=true，这里给个兜底（但默认你应该关闭 think）
+                # 兜底
                 if not content:
                     thinking = (msg.get("thinking") or "").strip()
                     if thinking:
                         log_warn("[OllamaClient] content empty but thinking exists. You should set think=false.")
-                        # 不建议用 thinking 当输出，因为里面可能是过程，不是最终 prompt
-                        # 这里直接判空让上层 fallback
                     raw = json.dumps(data, ensure_ascii=False)[:500]
                     log_warn(f"[OllamaClient] empty content, raw={raw}")
                     return ""
@@ -109,7 +107,7 @@ def build_llm_client(cfg: Dict[str, Any]) -> LLMClient:
             connect_timeout=int(cfg.get("connect_timeout", 5)),
             retries=int(cfg.get("retries", 2)),
             retry_backoff=float(cfg.get("retry_backoff", 2.0)),
-            think=bool(cfg.get("think", False)),  # ✅ 默认 False
+            think=bool(cfg.get("think", False)),  
         )
         return OllamaClient(ocfg)
 
