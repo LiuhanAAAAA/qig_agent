@@ -38,7 +38,7 @@ class AgentLoopConfig:
     stop_score: float = 0.82           # 达标分数停止
     stop_if_no_hard_fail: bool = True  # 达标 + 没硬失败 才停
     ucb_c: float = 1.0                 # UCB exploration
-    mutate_on_failure: bool = True     # 自我进化
+    mutate_on_failure: bool = True     # 自进化
     mutate_min_trials: int = 6
     mutate_max_success_rate: float = 0.20
 
@@ -81,7 +81,6 @@ def run_agent_episode(
     best_tags: List[str] = []
 
     # 每步都允许 prompt evaluator 先给一些 tags（cheap）
-    # 注意：你的 eval_prompts 输出结构以仓库为准，这里按你现有的用法写
     def _eval_prompt_one(p: str) -> Dict[str, Any]:
         res = eval_prompts(spec, user_query, [p])
         if isinstance(res, list) and len(res) > 0:
@@ -223,7 +222,7 @@ def run_agent_episode(
 
         # self-evolution：如果某些 tag 长期无效，给它变异技能
         if cfg.mutate_on_failure:
-            # 只在 hard tag 上变异（你后续可以扩大）
+            # 只在 hard tag 上变异，后面可以改成在软约束上也改
             for t in tags_all:
                 if memory.should_mutate(t, min_trials=int(cfg.mutate_min_trials), max_success_rate=float(cfg.mutate_max_success_rate)):
                     new_skill = skill_lib.mutate_new_skill(t)
