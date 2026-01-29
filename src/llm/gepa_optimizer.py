@@ -22,7 +22,6 @@ from src.agent.skill_library import SkillLibrary
 from src.agent.skill_selector import SkillSelector
 from src.agent.trajectory_memory import TrajectoryMemory
 
-# llm client protocol (你仓库里可能没有这个类型也没关系，只要 build_llm_client 返回的对象有 chat() 即可)
 try:
     from src.llm.clients import LLMClient  # type: ignore
 except Exception:
@@ -135,7 +134,7 @@ def _clean_llm_output(s: str) -> str:
 
 def _extract_prompt_only(text: str) -> str:
     """
-    ✅ 强化：只保留「正向 prompt」，把解释性句子砍掉
+    强化：只保留「正向 prompt」，把解释性句子砍掉
     """
     raw = _clean_llm_output(text)
 
@@ -158,7 +157,7 @@ def _extract_prompt_only(text: str) -> str:
     # 3) 切掉 negative prompt 之后的内容
     raw = re.split(r"(?is)\bnegative\s*prompt\s*:", raw)[0].strip()
 
-    # 4) 删除解释型废话句式（你日志里那种）
+    # 4) 删除解释型废话句式
     trash_patterns = [
         r"(?is)\bthe response is written.*$",
         r"(?is)\bthis prompt.*$",
@@ -169,7 +168,7 @@ def _extract_prompt_only(text: str) -> str:
     for pat in trash_patterns:
         raw = re.sub(pat, "", raw).strip()
 
-    # 5) 只取第一行（避免多段废话）
+    # 5) 只取第一行
     first_line = raw.splitlines()[0].strip() if raw.splitlines() else raw.strip()
     return first_line
 
@@ -191,7 +190,6 @@ def _word_count_fast(s: str) -> int:
 
 def _truncate_by_words(text: str, max_words: int, max_chars: int | None = None) -> str:
     """
-    ✅ 同时支持：
     - 按 words 截断（英文）
     - 按 chars 截断（中文/无空格场景 & 防止超长）
     """
@@ -308,7 +306,6 @@ class GEPAOptimizer:
     # ---------- mutations ----------
     def _apply_one_skill(self, parent_prompt: str, tags: List[str]) -> Tuple[str, Optional[str]]:
         """
-        ✅ 修复点：
         - available_skills_for_tags 可能返回 Skill 对象列表 -> 转成 skill_name 列表
         - selector.select 输入必须是 name list
         """
